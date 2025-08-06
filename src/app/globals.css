@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,7 +8,7 @@
   }
   
   body {
-    @apply bg-white text-gray-900 font-light;
+    @apply bg-white text-gray-900 font-light antialiased;
   }
 }
 
@@ -19,10 +18,10 @@
   }
   
   .portfolio-overlay {
-    @apply absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-500 flex items-center justify-center;
+    @apply absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-500 flex items-center justify-center;
   }
   
   .portfolio-text {
-    @apply text-white text-2xl md:text-3xl font-light tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-500;
+    @apply text-white font-light tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-500 uppercase;
   }
 }

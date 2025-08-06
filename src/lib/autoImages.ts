@@ -11,26 +11,44 @@ export interface Image {
   videoUrl?: string
 }
 
+// This function will be called at build time
 export function getImagesFromFolder(folderPath: string): Image[] {
   try {
     const publicPath = path.join(process.cwd(), 'public', folderPath)
+    
+    // Check if directory exists
+    if (!fs.existsSync(publicPath)) {
+      console.log(`Directory not found: ${publicPath}`)
+      return []
+    }
+    
     const files = fs.readdirSync(publicPath)
     
-    return files
-      .filter(file => /\.(jpg|jpeg|png|webp)$/i.test(file))
+    const images = files
+      .filter(file => {
+        const ext = path.extname(file).toLowerCase()
+        return ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext)
+      })
       .filter(file => !file.toLowerCase().includes('cover')) // Exclude cover images
-      .map((file, index) => ({
-        id: `${folderPath.replace(/[\/\\]/g, '-')}-${index + 1}`,
-        src: `/${folderPath}/${file}`,
-        alt: file.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' '),
-        title: file.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' ')
-          .split(' ')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ')
-      }))
-      .sort((a, b) => a.src.localeCompare(b.src)) // Sort alphabetically
+      .map((file, index) => {
+        const nameWithoutExt = path.basename(file, path.extname(file))
+        const cleanName = nameWithoutExt
+          .replace(/[-_]/g, ' ')
+          .replace(/\b\w/g, l => l.toUpperCase())
+        
+        return {
+          id: `${folderPath.replace(/[\/\\]/g, '-')}-${index + 1}`,
+          src: `/${folderPath}/${file}`,
+          alt: cleanName,
+          title: cleanName
+        }
+      })
+      .sort((a, b) => a.src.localeCompare(b.src))
+    
+    console.log(`Found ${images.length} images in ${folderPath}`)
+    return images
   } catch (error) {
-    console.log(`Folder ${folderPath} not found, returning empty array`)
+    console.error(`Error reading folder ${folderPath}:`, error)
     return []
   }
 }
@@ -38,13 +56,22 @@ export function getImagesFromFolder(folderPath: string): Image[] {
 export function getVideosFromFolder(folderPath: string, videoFolderPath: string): Image[] {
   try {
     const publicPath = path.join(process.cwd(), 'public', folderPath)
+    
+    if (!fs.existsSync(publicPath)) {
+      console.log(`Directory not found: ${publicPath}`)
+      return []
+    }
+    
     const files = fs.readdirSync(publicPath)
     
     return files
-      .filter(file => /\.(jpg|jpeg|png|webp)$/i.test(file))
+      .filter(file => {
+        const ext = path.extname(file).toLowerCase()
+        return ['.jpg', '.jpeg', '.png', '.webp'].includes(ext)
+      })
       .filter(file => !file.toLowerCase().includes('cover'))
       .map((file, index) => {
-        const baseName = file.replace(/\.[^/.]+$/, "")
+        const baseName = path.basename(file, path.extname(file))
         const videoExtensions = ['.mp4', '.webm', '.mov']
         
         // Look for matching video file
@@ -57,21 +84,22 @@ export function getVideosFromFolder(folderPath: string, videoFolderPath: string)
           }
         }
         
+        const cleanName = baseName
+          .replace(/[-_]/g, ' ')
+          .replace(/\b\w/g, l => l.toUpperCase())
+        
         return {
           id: `video-${index + 1}`,
           src: `/${folderPath}/${file}`,
-          alt: baseName.replace(/[-_]/g, ' '),
-          title: baseName.replace(/[-_]/g, ' ')
-            .split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' '),
+          alt: cleanName,
+          title: cleanName,
           type: 'video' as const,
           videoUrl: videoUrl || undefined
         }
       })
       .sort((a, b) => a.src.localeCompare(b.src))
   } catch (error) {
-    console.log(`Folder ${folderPath} not found, returning empty array`)
+    console.error(`Error reading folder ${folderPath}:`, error)
     return []
   }
 }

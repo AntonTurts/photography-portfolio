@@ -1,7 +1,14 @@
 // src/lib/images.ts
-import { getImagesFromFolder, getVideosFromFolder, Image } from './autoImages'
+import { snowsportsPhotoImages, snowsportsVideoImages, eventsImages, outdoorsImages } from './imagesConfig'
 
-export type { Image }
+export interface Image {
+  id: string
+  src: string
+  alt: string
+  title?: string
+  type?: 'image' | 'video'
+  videoUrl?: string
+}
 
 export interface Category {
   slug: string
@@ -23,28 +30,28 @@ export const getPortfolioData = (): PortfolioData => {
         title: 'Snowsports Photography',
         description: 'Capturing the thrill and beauty of winter sports through dynamic action shots and stunning alpine landscapes.',
         coverImage: '/images/snowsports-photo/cover.jpg',
-        images: getImagesFromFolder('images/snowsports-photo')
+        images: snowsportsPhotoImages
       },
       {
         slug: 'snowsports-video',
         title: 'Snowsports Videography',
         description: 'Dynamic video content showcasing the energy and excitement of mountain sports.',
         coverImage: '/images/snowsports-video/cover.jpg',
-        images: getVideosFromFolder('images/snowsports-video', 'videos')
+        images: snowsportsVideoImages
       },
       {
         slug: 'events',
         title: 'Events Photography',
         description: 'Documenting life\'s special moments with a keen eye for emotion and authentic storytelling.',
         coverImage: '/images/events/cover.jpg',
-        images: getImagesFromFolder('images/events')
+        images: eventsImages
       },
       {
         slug: 'outdoors',
         title: 'Outdoors Photography',
         description: 'Exploring the natural world through landscape and adventure photography.',
         coverImage: '/images/outdoors/cover.jpg',
-        images: getImagesFromFolder('images/outdoors')
+        images: outdoorsImages
       }
     ]
   }
